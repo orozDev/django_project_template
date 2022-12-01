@@ -1,0 +1,12 @@
+asgiref
+Django
+django-ckeditor
+django-cleanup
+django-filte
+django-jazzmin
+django-js-asset
+django-phonenumber-field
+django-resized
+phonenumbers
+Pillow
+sqlpars
