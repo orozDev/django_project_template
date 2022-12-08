@@ -2,7 +2,7 @@ asgiref
 Django
 django-ckeditor
 django-cleanup
-django-filte
+django-filter
 django-jazzmin
 django-js-asset
 django-phonenumber-field
