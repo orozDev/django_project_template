@@ -18,12 +18,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include, re_path
 from django.views.static import serve 
+from django.shortcuts import redirect
 
 
 urlpatterns = [
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('admin/', admin.site.urls),
-    path('', include('core.urls'))
+    path('api/v1/', include('api.endpoints')),
+    path('', include('core.urls')),
+    path('', lambda r: redirect('/admin/'))
 ]
 
 if settings.DEBUG:

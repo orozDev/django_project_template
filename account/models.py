@@ -29,6 +29,7 @@ class User(AbstractUser):
     @property
     def get_full_name(self):
         return f'{self.last_name} {self.first_name}'
+    
     get_full_name.fget.short_description = _('полное имя')    
 
     def __str__(self):

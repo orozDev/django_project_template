@@ -4,6 +4,11 @@ django-cleanup
 django-filter
 django-jazzmin
 django-phonenumber-field
+django-cors-headers
+djangorestframework
+django-rest-registration
+drf-yasg
 django-resized
 phonenumbers
 Pillow
+python-decouple
