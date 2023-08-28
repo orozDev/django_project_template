@@ -3,17 +3,21 @@ from django.utils.translation import gettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.authtoken.models import Token
 from rest_framework import status, viewsets, filters
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, get_object_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_registration.utils.responses import get_ok_response
 
 from api.mixins import PaginationBreaker
-from .serializers import LoginSerializer, UserSerializer, ProfileSerializer, RegisterUserSerializer
-from account.models import User
+from .serializers import LoginSerializer, UserSerializer, ProfileSerializer, RegisterUserSerializer, \
+    ResetPasswordSerializer, SendResetPasswordKeySerializer, ChangePasswordSerializer
+from account.models import User, UserResetPassword
+
+from .services import UserPasswordResetManager
 from ..paginations import StandardResultsSetPagination
 
 
-class LoginApi(GenericAPIView):
+class LoginApiView(GenericAPIView):
     serializer_class = LoginSerializer
     permission_classes = (AllowAny,)
 
@@ -30,7 +34,7 @@ class LoginApi(GenericAPIView):
                         status.HTTP_400_BAD_REQUEST)
 
 
-class RegisterApi(GenericAPIView):
+class RegisterApiView(GenericAPIView):
 
     serializer_class = RegisterUserSerializer
     permission_classes = (AllowAny,)
@@ -75,3 +79,45 @@ class UserViewSet(PaginationBreaker, viewsets.ReadOnlyModelViewSet):
     ordering_fields = ['created_at']
     search_fields = ['phone', 'first_name', 'last_name', 'email', 'username']
     permission_classes = (IsAuthenticated,)
+
+
+class ChangePasswordApiView(GenericAPIView):
+    serializer_class = ChangePasswordSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = request.user
+        user.set_password(serializer.validated_data['password'])
+        user.save()
+        return get_ok_response(_('Пароль успешно изменен'))
+
+
+class SendResetPasswordKeyApiView(GenericAPIView):
+    serializer_class = SendResetPasswordKeySerializer
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
+        user = get_object_or_404(User, email=email)
+        manager = UserPasswordResetManager(user)
+        manager.send_key()
+        return get_ok_response('The key has been send successfully')
+
+
+class ResetPasswordByKeyApiView(GenericAPIView):
+    serializer_class = ResetPasswordSerializer
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        key = serializer.validated_data['key']
+        new_password = serializer.validated_data['new_password']
+        reset_password = get_object_or_404(UserResetPassword, key=key)
+        manager = UserPasswordResetManager(reset_password.user)
+        is_changed = manager.reset_password(new_password, key)
+        return Response({'is_changed': is_changed}, status=status.HTTP_200_OK)

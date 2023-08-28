@@ -161,6 +161,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'account.User'
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_USE_TLS = json.loads(config('EMAIL_USE_TLS'))
+EMAIL_USE_SSL = json.loads(config('EMAIL_USE_SSL'))
+EMAIL_PORT = int(config('EMAIL_PORT'))
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+
+EXPIRE_DAYS = int(config('EXPIRE_DAYS'))
+FRONTEND_HOST = config('FRONTEND_HOST')
+FRONTED_RESET_PASSWORD_LINK = config('FRONTED_RESET_PASSWORD_LINK')
+QUERY_FIELD_NAME_RP = config('FRONTED_RESET_PASSWORD_LINK')
+
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',

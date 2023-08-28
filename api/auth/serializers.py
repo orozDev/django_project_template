@@ -1,5 +1,5 @@
 from rest_framework import serializers
-
+from django.contrib.auth.password_validation import validate_password
 from account.models import User
 
 
@@ -64,3 +64,30 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True},
         }
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+
+    old_password = serializers.CharField()
+    password = serializers.CharField()
+
+    def validate_old_password(self, old_password):
+        user = self.context['request'].user
+        if not user.check_password(old_password):
+            raise serializers.ValidationError(_('Старый пароль неверный'))
+        return old_password
+
+    def validate_password(self, password):
+        user = self.context['request'].user
+        validate_password(password, user=user)
+        return password
+
+
+class SendResetPasswordKeySerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+
+    key = serializers.UUIDField()
+    new_password = serializers.CharField(validators=[validate_password])

@@ -4,8 +4,9 @@ from django.utils.translation import gettext_lazy as _
 from django_resized import ResizedImageField
 from phonenumber_field.modelfields import PhoneNumberField
 from .managers import UserManager
+from utils.models import TimeStampAbstractModel
 
-  
+
 class User(AbstractUser):
     
     class Meta:
@@ -34,5 +35,20 @@ class User(AbstractUser):
 
     def __str__(self):
         return f'{self.get_full_name or str(self.phone)}'
+
+
+class UserResetPassword(TimeStampAbstractModel):
+
+    class Meta:
+        verbose_name = _('Ключ для сброса пароля')
+        verbose_name_plural = _('Ключи для сброса пароля')
+        ordering = ('-created_at', '-updated_at')
+
+    user = models.OneToOneField('account.User', on_delete=models.CASCADE, verbose_name=_('пользователь'))
+    key = models.UUIDField(_('ключ'), default=uuid4, editable=False)
+    expire_date = models.DateTimeField(_('срок действия'), default=timezone.now() + timezone.timedelta(days=settings.EXPIRE_DAYS))
+
+    def __str__(self):
+        return f'{self.user}'
 
 # Create your models here.
