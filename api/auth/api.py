@@ -120,4 +120,7 @@ class ResetPasswordByKeyApiView(GenericAPIView):
         reset_password = get_object_or_404(UserResetPassword, key=key)
         manager = UserPasswordResetManager(reset_password.user)
         is_changed = manager.reset_password(new_password, key)
-        return Response({'is_changed': is_changed}, status=status.HTTP_200_OK)
+        return Response(
+            {'is_changed': is_changed},
+            status=status.HTTP_200_OK if is_changed else status.HTTP_400_BAD_REQUEST
+        )
