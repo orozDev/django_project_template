@@ -105,7 +105,7 @@ class SendResetPasswordKeyApiView(GenericAPIView):
         user = get_object_or_404(User, email=email)
         manager = UserPasswordResetManager(user)
         manager.send_key()
-        return get_ok_response('The key has been send successfully')
+        return get_ok_response(_('Ключ успешно отправлен'))
 
 
 class ResetPasswordByKeyApiView(GenericAPIView):
