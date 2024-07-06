@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # third party
     'django_filters',
     'django_cleanup',
     'ckeditor_uploader',
@@ -50,6 +52,8 @@ INSTALLED_APPS = [
     'rest_registration',
     'corsheaders',
     'ckeditor',
+
+    # apps
     'account',
     'core',
 ]
@@ -94,11 +98,11 @@ if json.loads(config('USE_POSTGRESQL')):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': config('DB_NAME'),
-            'USER': config('DB_USERNAME'),
-            'PASSWORD': config('DB_PASSWORD'),
-            'HOST': config('HOST'),
-            'PORT': config('PORT'),
+            'NAME': config('POSTGRES_DB'),
+            'USER': config('POSTGRES_USER'),
+            'PASSWORD': config('POSTGRES_PASSWORD'),
+            'HOST': config('POSTGRES_HOST'),
+            'PORT': config('POSTGRES_PORT'),
         }
     }
 else:
@@ -140,6 +144,13 @@ USE_I18N = True
 
 USE_TZ = True
 
+gettext = lambda s: s
+LANGUAGES = (
+    ('ru', gettext('Russian')),
+    ('en', gettext('English')),
+)
+
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'ru'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
@@ -169,8 +180,10 @@ EMAIL_PORT = int(config('EMAIL_PORT'))
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
-EXPIRE_DAYS = int(config('EXPIRE_DAYS'))
 FRONTEND_HOST = config('FRONTEND_HOST')
+BACKEND_HOST = config('BACKEND_HOST')
+
+EXPIRE_DAYS = int(config('EXPIRE_DAYS'))
 FRONTED_RESET_PASSWORD_LINK = config('FRONTED_RESET_PASSWORD_LINK')
 QUERY_FIELD_NAME_RP = config('FRONTED_RESET_PASSWORD_LINK')
 
@@ -178,6 +191,10 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'api.parsers.MultiPartJSONParser',
     ],
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_PAGINATION_CLASS': 'api.paginations.StandardResultsSetPagination',

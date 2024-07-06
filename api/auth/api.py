@@ -6,7 +6,6 @@ from rest_framework import status, viewsets, filters
 from rest_framework.generics import GenericAPIView, get_object_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_registration.utils.responses import get_ok_response
 
 from api.mixins import PaginationBreaker
 from .serializers import LoginSerializer, UserSerializer, ProfileSerializer, RegisterUserSerializer, \
@@ -30,7 +29,7 @@ class LoginApiView(GenericAPIView):
             token = Token.objects.get_or_create(user=user)[0].key
             data = {**serializer.data, 'token': f'{token}'}
             return Response(data, status.HTTP_200_OK)
-        return Response({'login': _('Не существует пользователя или неверный пароль')},
+        return Response({'detail': _('Не существует пользователя или неверный пароль')},
                         status.HTTP_400_BAD_REQUEST)
 
 
@@ -91,7 +90,7 @@ class ChangePasswordApiView(GenericAPIView):
         user = request.user
         user.set_password(serializer.validated_data['password'])
         user.save()
-        return get_ok_response(_('Пароль успешно изменен'))
+        return Response({'detail': _('Пароль успешно изменен')})
 
 
 class SendResetPasswordKeyApiView(GenericAPIView):
@@ -105,7 +104,7 @@ class SendResetPasswordKeyApiView(GenericAPIView):
         user = get_object_or_404(User, email=email)
         manager = UserPasswordResetManager(user)
         manager.send_key()
-        return get_ok_response(_('Ключ успешно отправлен'))
+        return Response({'detail': _('Ключ успешно отправлен')})
 
 
 class ResetPasswordByKeyApiView(GenericAPIView):

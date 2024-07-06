@@ -1,1 +1,1 @@
-USE_PAGINATION = 'use_pagination'
+WAITING = 'waiting'
