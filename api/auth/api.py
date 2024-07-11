@@ -21,7 +21,7 @@ class LoginApiView(GenericAPIView):
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
-        login_serializer = self.serializer_class(data=request.data)
+        login_serializer = self.get_serializer(data=request.data)
         login_serializer.is_valid(raise_exception=True)
         user = authenticate(username=request.data['username'], password=request.data['password'])
         if user:
@@ -39,7 +39,7 @@ class RegisterApiView(GenericAPIView):
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         response_serializer = UserSerializer(user, many=False, context={'request': request})
@@ -98,7 +98,7 @@ class SendResetPasswordKeyApiView(GenericAPIView):
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
         user = get_object_or_404(User, email=email)
@@ -112,7 +112,7 @@ class ResetPasswordByKeyApiView(GenericAPIView):
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         key = serializer.validated_data['key']
         new_password = serializer.validated_data['new_password']
